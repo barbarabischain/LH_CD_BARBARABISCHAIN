@@ -13,13 +13,21 @@ features = ['bairro_group', 'bairro', 'latitude', 'longitude', 'room_type',
 X = df[features]
 y = df['price']
 
+le_bairro_group = LabelEncoder()
+le_bairro = LabelEncoder()
+le_room = LabelEncoder()
+
+X['bairro_group'] = le_bairro_group.fit_transform(X['bairro_group'])
+X['bairro'] = le_bairro.fit_transform(X['bairro'])
+X['room_type'] = le_room.fit_transform(X['room_type'])
+
 # for col in ['bairro_group', 'bairro', 'room_type']:
 #     le = LabelEncoder()
 #     X.loc[:, col] = le.fit_transform(X[col])
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-regr = RandomForestRegressor(max_depth=2, random_state=0)
+regr = RandomForestRegressor(max_depth=None, random_state=0)
 regr.fit(X_train, y_train)
 
 y_pred = regr.predict(X_test)
@@ -35,3 +43,19 @@ print(f'y_pred: {y_pred}')
 print(f'average price: {y_test.mean()}')
 print(f'length of x_train: {len(X_train)}')
 print(f'length of x_test: {len(X_test)}')
+
+skylit = {'bairro_group': 'Manhattan',
+ 'bairro': 'Midtown',
+ 'latitude': 40.75362,
+ 'longitude': -73.98377,
+ 'room_type': 'Entire home/apt',
+ 'minimo_noites': 1,
+ 'calculado_host_listings_count': 2,
+ 'disponibilidade_365': 355}
+skil = pd.DataFrame([skylit])
+
+skil['bairro_group'] = le_bairro_group.transform(skil['bairro_group'])
+skil['bairro'] = le_bairro.transform(skil['bairro'])
+skil['room_type'] = le_room.transform(skil['room_type'])
+
+print(f'preço: {regr.predict(skil)}')
